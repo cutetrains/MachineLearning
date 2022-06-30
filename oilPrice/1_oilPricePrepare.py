@@ -9,15 +9,13 @@ import datetime as dt
 import os
 from os.path import expanduser
 from dotenv import load_dotenv
-#import secrets
-useQuandl = True
 
 def addYears(d, years):
     try:
-#Return same day of the current year        
+        #Return same day of the current year        
         return d.replace(year = d.year + years)
     except ValueError:
-#If not same day, it will return other, i.e.  February 29 to March 1 etc.        
+        #If not same day, it will return other, i.e.  February 29 to March 1 etc.        
         return d + (date(d.year + years, 1, 1) - date(d.year, 1, 1))
 
 
@@ -37,17 +35,14 @@ def Insert_row(row_number, df, row_value):
     return df
 
 #Quandl has a repository for oil records that is updated
-if(useQuandl == True):
-    load_dotenv(expanduser("~")+'\.env')
-    quandl.ApiConfig.api_key = os.getenv('api_key_quandl')
-    today = date.today()
-    print("Today's date:", today)
-    # Importing our data
-    X_raw = quandl.get("FRED/DCOILBRENTEU", start_date="1987-05-20", end_date=today)
-    X_raw.reset_index(inplace=True)
-    X_raw = X_raw.rename(columns={'Value': 'Price'})
-else:
-    X_raw = pd.read_csv("C:\\Users\\gusta\\Dropbox\\Ekonomi\\Oil\\brent-daily_csv.csv",index_col=False)
+load_dotenv(os.sep.join((expanduser("~"),'.env')))
+quandl.ApiConfig.api_key = os.getenv('api_key_quandl')
+today = date.today()
+print("Today's date:", today)
+# Importing our data
+X_raw = quandl.get("FRED/DCOILBRENTEU", start_date="1987-05-20", end_date=today)
+X_raw.reset_index(inplace=True)
+X_raw = X_raw.rename(columns={'Value': 'Price'})
 
 firstDateS = str(X_raw.at[0, 'Date'])[0:10]
 firstDateDT = datetime.strptime(str(firstDateS), '%Y-%m-%d')
@@ -82,5 +77,4 @@ while listComplete == False:
         print("Complete")
 
 X_raw['Date'] = pd.to_datetime(X_raw['Date']).dt.date
-X_raw.to_csv('C:\\Users\\gusta\\Dropbox\\Ekonomi\\Oil\\1_Brent_Daily_RawData.csv')
-
+X_raw.to_csv(os.sep.join((expanduser("~"),'1_Brent_Daily_RawData.csv')))
